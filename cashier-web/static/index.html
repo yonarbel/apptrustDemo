@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐸 JFrog's Lily Pad Bistro - Order & Pay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #0f3020 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .frog-emoji {
+            font-size: 4rem;
+            animation: hop 1s ease-in-out infinite;
+        }
+
+        @keyframes hop {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: #90EE90;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .joke-of-the-day {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #E8F5E9;
+            font-size: 0.95rem;
+        }
+
+        .joke-text {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .menu-section, .bill-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #1a472a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-item {
+            display: grid;
+            grid-template-columns: 1fr auto 80px;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+            transform: translateX(5px);
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #1a472a;
+            font-size: 1.1rem;
+        }
+
+        .item-description {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #4CAF50;
+            font-size: 1.3rem;
+            text-align: right;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .qty-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            font-weight: 600;
+            color: #1a472a;
+        }
+
+        .bill-section {
+            position: sticky;
+            top: 20px;
+        }
+
+        .bill-items {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .bill-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .bill-item-name {
+            font-weight: 500;
+            color: #1a472a;
+        }
+
+        .bill-item-qty {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .bill-item-price {
+            font-weight: 600;
+            color: #4CAF50;
+            text-align: right;
+        }
+
+        .bill-remove {
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .bill-remove:hover {
+            background: #da190b;
+            transform: scale(1.1);
+        }
+
+        .bill-totals {
+            padding: 20px;
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .total-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .total-label {
+            color: #1a472a;
+            font-weight: 600;
+        }
+
+        .total-value {
+            color: #4CAF50;
+            font-weight: 700;
+        }
+
+        .subtotal-row {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .tax-row {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .grand-total-row {
+            border-top: 2px solid #4CAF50;
+            padding-top: 12px;
+            font-size: 1.4rem;
+        }
+
+        .grand-total-row .total-label {
+            font-size: 1.3rem;
+        }
+
+        .grand-total-row .total-value {
+            font-size: 1.4rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-process {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-process:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-process:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #da190b;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .receipt {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 2px dashed #4CAF50;
+            display: none;
+            text-align: center;
+        }
+
+        .receipt.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .receipt-title {
+            font-size: 1.3rem;
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .receipt-message {
+            color: #1a472a;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .empty-state-emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-text {
+            font-size: 1rem;
+            color: #1a472a;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .bill-section {
+                position: static;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .frog-emoji {
+                font-size: 2.5rem;
+            }
+        }
+
+        .jfrog-badge {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #90EE90;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .bill-item-remove-btn {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <div class="frog-emoji">🐸</div>
+                <div>
+                    <h1>JFrog's Lily Pad Bistro</h1>
+                    <span class="jfrog-badge">Powered by JFrog Artifacts</span>
+                </div>
+            </div>
+            <p class="tagline">"Ribbiting Good Deployments, Hop Into Your Artifacts!"</p>
+
+            <div class="joke-of-the-day">
+                <strong>🤣 Joke of the Day:</strong>
+                <div class="joke-text">
+                    Why did the frog jump into the artifact repository?
+                    <br>Because it wanted to find the <strong>lily-pad versions</strong>! 🪴📦
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- MENU SECTION -->
+            <div class="menu-section">
+                <div class="section-title">
+                    <span>🍽️ Lily Pad Menu</span>
+                </div>
+                <div id="menuContainer"></div>
+            </div>
+
+            <!-- BILL SECTION -->
+            <div class="bill-section">
+                <div class="section-title">
+                    <span>💳 Your Order</span>
+                </div>
+
+                <div id="billContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-emoji">🎣</div>
+                        <div class="empty-state-text">Start catching your order!</div>
+                    </div>
+                </div>
+
+                <div class="bill-totals" id="totalsContainer" style="display: none;">
+                    <div class="total-row subtotal-row">
+                        <span class="total-label">Subtotal:</span>
+                        <span class="total-value" id="subtotal">$0.00</span>
+                    </div>
+                    <div class="total-row tax-row">
+                        <span class="total-label">Tax (10%):</span>
+                        <span class="total-value" id="tax">$0.00</span>
+                    </div>
+                    <div class="total-row grand-total-row">
+                        <span class="total-label">Total:</span>
+                        <span class="total-value" id="total">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-process" id="processBtn" disabled>🐸 Process Payment</button>
+                    <button class="btn btn-clear" id="clearBtn" style="display: none;">Clear Order</button>
+                </div>
+
+                <div class="loading" id="loading">Processing... 🐸</div>
+
+                <div class="receipt" id="receipt">
+                    <div class="receipt-title">✅ Order Complete!</div>
+                    <div class="receipt-message">
+                        Thanks for hopping by! 🎉
+                    </div>
+                    <div style="color: #4CAF50; font-size: 3rem; margin: 15px 0;">
+                        🐸💚
+                    </div>
+                    <div style="color: #666; font-size: 0.9rem;">
+                        Your package is ready to deploy! 🚀
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>🐸 Built with love by JFrog • Where artifacts hop to the next level 🚀</p>
+            <div class="status-badge">✅ All Services Running</div>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002';
+        let cart = {};
+
+        // Frog-themed menu with fun descriptions
+        const frogyMenu = {
+            'fly-burger': { price: 12.0, emoji: '🍔', name: 'Fly Burger', desc: 'Catch of the day!' },
+            'lily-fries': { price: 5.0, emoji: '🍟', name: 'Lily Pad Fries', desc: 'Golden & crispy' },
+            'tadpole-shake': { price: 3.5, emoji: '🥤', name: 'Tadpole Shake', desc: 'Sweet refreshment' },
+            'dragonfly-pizza': { price: 14.0, emoji: '🍕', name: 'Dragonfly Pizza', desc: 'Speedy delivery!' },
+            'mosquito-wings': { price: 8.5, emoji: '🍗', name: 'Mosquito Wings', desc: 'Protein-packed!' },
+            'swamp-salad': { price: 7.0, emoji: '🥗', name: 'Swamp Salad', desc: 'Fresh from the bog' },
+            'cricket-chips': { price: 4.5, emoji: '🥔', name: 'Cricket Chips', desc: 'Jumpy good!' },
+            'catfish-combo': { price: 16.0, emoji: '🐟', name: 'Catfish Combo', desc: 'Aquatic adventure' }
+        };
+
+        // Load menu
+        function loadMenu() {
+            const menuContainer = document.getElementById('menuContainer');
+            menuContainer.innerHTML = '';
+
+            Object.entries(frogyMenu).forEach(([key, item]) => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <div>
+                        <div class="item-name">${item.emoji} ${item.name}</div>
+                        <div class="item-description">${item.desc}</div>
+                    </div>
+                    <div class="item-price">$${item.price.toFixed(2)}</div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" onclick="decreaseQty('${key}')">−</button>
+                        <input type="number" class="qty-input" id="qty-${key}" value="0" readonly>
+                        <button class="qty-btn" onclick="increaseQty('${key}')">+</button>
+                    </div>
+                `;
+                menuContainer.appendChild(menuItem);
+            });
+        }
+
+        // Quantity controls
+        function increaseQty(itemKey) {
+            const input = document.getElementById(`qty-${itemKey}`);
+            const qty = parseInt(input.value) + 1;
+            input.value = qty;
+            updateCart(itemKey, qty);
+        }
+
+        function decreaseQty(itemKey) {
+            const input = document.getElementById(`qty-${itemKey}`);
+            let qty = parseInt(input.value) - 1;
+            if (qty < 0) qty = 0;
+            input.value = qty;
+            updateCart(itemKey, qty);
+        }
+
+        // Update cart
+        function updateCart(itemKey, qty) {
+            if (qty > 0) {
+                cart[itemKey] = qty;
+            } else {
+                delete cart[itemKey];
+            }
+            updateBill();
+        }
+
+        // Update bill display
+        function updateBill() {
+            const billContainer = document.getElementById('billContainer');
+            const totalsContainer = document.getElementById('totalsContainer');
+            const processBtn = document.getElementById('processBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if (Object.keys(cart).length === 0) {
+                billContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-emoji">🎣</div>
+                        <div class="empty-state-text">Start catching your order!</div>
+                    </div>
+                `;
+                totalsContainer.style.display = 'none';
+                processBtn.disabled = true;
+                clearBtn.style.display = 'none';
+                return;
+            }
+
+            clearBtn.style.display = 'block';
+            processBtn.disabled = false;
+
+            let billHTML = '<div class="bill-items">';
+            let subtotal = 0;
+
+            Object.entries(cart).forEach(([key, qty]) => {
+                const item = frogyMenu[key];
+                const itemTotal = item.price * qty;
+                subtotal += itemTotal;
+
+                billHTML += `
+                    <div class="bill-item">
+                        <div>
+                            <div class="bill-item-name">${item.emoji} ${item.name}</div>
+                            <div class="bill-item-qty">Qty: ${qty}</div>
+                        </div>
+                        <div class="bill-item-price">$${itemTotal.toFixed(2)}</div>
+                        <button class="bill-remove" onclick="removeFromCart('${key}')">✕</button>
+                    </div>
+                `;
+            });
+
+            billHTML += '</div>';
+            billContainer.innerHTML = billHTML;
+
+            const tax = subtotal * 0.10;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+            totalsContainer.style.display = 'block';
+        }
+
+        function removeFromCart(itemKey) {
+            document.getElementById(`qty-${itemKey}`).value = 0;
+            updateCart(itemKey, 0);
+        }
+
+        function clearOrder() {
+            cart = {};
+            Object.keys(frogyMenu).forEach(key => {
+                document.getElementById(`qty-${key}`).value = 0;
+            });
+            updateBill();
+            document.getElementById('receipt').classList.remove('show');
+        }
+
+        // Process payment
+        async function processPayment() {
+            const loading = document.getElementById('loading');
+            const processBtn = document.getElementById('processBtn');
+            const receipt = document.getElementById('receipt');
+
+            if (Object.keys(cart).length === 0) return;
+
+            loading.style.display = 'block';
+            processBtn.disabled = true;
+
+            try {
+                const items = [];
+                Object.entries(cart).forEach(([key, qty]) => {
+                    for (let i = 0; i < qty; i++) {
+                        items.push(key);
+                    }
+                });
+
+                const response = await fetch(`${API_BASE}/bill`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ items })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        receipt.classList.add('show');
+                        processBtn.style.display = 'none';
+
+                        setTimeout(() => {
+                            clearOrder();
+                            processBtn.style.display = 'block';
+                        }, 3000);
+                    }, 800);
+                } else {
+                    alert('Error processing payment');
+                    loading.style.display = 'none';
+                    processBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing payment');
+                loading.style.display = 'none';
+                processBtn.disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('processBtn').addEventListener('click', processPayment);
+        document.getElementById('clearBtn').addEventListener('click', clearOrder);
+
+        // Initialize
+        loadMenu();
+    </script>
+</body>
+</html>

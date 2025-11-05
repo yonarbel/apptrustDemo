@@ -1,0 +1,83 @@
+name: Build Kitchen-Worker
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'kitchen-worker/**'
+      - '.github/workflows/build-kitchen-worker.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'kitchen-worker/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Download dependencies
+        working-directory: ./kitchen-worker
+        run: go mod download
+
+      - name: Run tests
+        working-directory: ./kitchen-worker
+        run: go test -v
+
+      - name: Build binary
+        working-directory: ./kitchen-worker
+        run: go build -o kitchen-worker
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/apptrust-kitchen-worker
+          tags: |
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./kitchen-worker
+          file: ./kitchen-worker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Comment PR with image info
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Kitchen-Worker build and tests passed! 🍳'
+            })

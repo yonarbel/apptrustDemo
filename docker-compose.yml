@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  reservation-api:
+    build: ./reserveration-api
+    ports: ["3001:3001"]
+  cashier-web:
+    build: ./cashier-web
+    ports: ["3002:3002"]
+  kitchen-worker:
+    build: ./kitchen-worker
