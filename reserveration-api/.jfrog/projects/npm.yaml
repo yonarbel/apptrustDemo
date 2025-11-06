@@ -1,0 +1,8 @@
+version: 1
+type: npm
+resolver:
+    repo: llpd-npm-dev
+    serverId: devrel
+deployer:
+    repo: llpd-npm-dev
+    serverId: devrel
