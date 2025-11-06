@@ -39,7 +39,7 @@ jobs:
          oidc-provider-name: jfrog-github-oidc
     
       - name: Set CLI Config
-        run: jf npm-config --global=true --repo-resolve=llpd-npm --repo-deploy=llpd-npm
+        run: jf npm-config --global=true --repo-resolve=llpd-npm-dev --repo-deploy=llpd-npm-dev
         
 
       - name: Install dependencies
